@@ -22,7 +22,7 @@ export type FeedItemProps = {
   author: { username: string | null; imageUrl: string };
 };
 
-export async function FeedItem(props: FeedItemProps) {
+export default async function FeedItem(props: FeedItemProps) {
   const { post, author } = props;
 
   if (!author.username) return null;

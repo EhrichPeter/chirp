@@ -11,13 +11,15 @@ export function LikeButton(props: {
   isLiked: boolean;
 }) {
   const { post } = props;
-  const { execute, status } = useAction(toggleLike, {
+  const { execute } = useAction(toggleLike, {
     onSuccess: () => {
       if (props.isLiked) {
         toastSuccess("Unliked! 😢");
       } else {
         toastSuccess("Liked! ❤️");
       }
+
+      console.log(props.isLiked);
     },
     onError: () => {
       toastError("Like failed! 😢");
@@ -31,19 +33,9 @@ export function LikeButton(props: {
   return (
     <div className="flex items-center">
       <Button variant={"ghost"} className="-m-3" onClick={onHandleSubmit}>
-        {props.isLiked || status === "hasSucceeded" ? (
-          <Heart size={16} fill="red" />
-        ) : (
-          <Heart size={16} />
-        )}
+        {props.isLiked ? <Heart size={16} fill="red" /> : <Heart size={16} />}
       </Button>
-      <span className=" text-xs text-gray-400">
-        {status === "hasSucceeded"
-          ? props.isLiked
-            ? post.likeCount - 1
-            : post.likeCount + 1
-          : post.likeCount}
-      </span>
+      <span className=" text-xs text-gray-400">{post.likeCount}</span>
     </div>
   );
 }

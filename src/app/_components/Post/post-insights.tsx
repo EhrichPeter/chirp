@@ -1,7 +1,7 @@
 import { getManyRepliesByPostId } from "@/server/post/data";
 import { Suspense } from "react";
 
-export async function PostInsights(props: { postId: string }) {
+export default async function PostInsights(props: { postId: string }) {
   const { postId } = props;
   const replies = await getManyRepliesByPostId(postId);
 

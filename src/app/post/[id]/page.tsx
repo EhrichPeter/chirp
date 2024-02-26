@@ -1,9 +1,9 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { FeedItem } from "@/app/_components/Feed/feed-item";
-import { Header } from "@/app/_components/Header/header";
-import { PostInsights } from "@/app/_components/Post/post-insights";
-import { ReplyFeed } from "@/app/_components/Post/reply-feed";
+import FeedItem from "@/app/_components/Feed/feed-item";
+import Header from "@/app/_components/Header/header";
+import PostInsights from "@/app/_components/Post/post-insights";
+import ReplyFeed from "@/app/_components/Post/reply-feed";
 import { Button } from "@/components/ui/button";
 import { getOneById } from "@/server/post/data";
 

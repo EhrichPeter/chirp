@@ -5,11 +5,12 @@ import { Redis } from "@upstash/redis";
 import { action } from "../safe-action";
 import { auth } from "@clerk/nextjs";
 import { db } from "@/server/db";
-import { createPostFormSchema } from "@/app/_components/Header/post-header";
+import { revalidatePath } from "next/cache";
+import { createPostFormSchema } from "./models";
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(3, "1 m"),
+  limiter: Ratelimit.slidingWindow(30, "1 m"),
   analytics: true,
 });
 
@@ -43,5 +44,5 @@ export const createPost = action(createPostFormSchema, async (input) => {
 
     return post;
   });
-  return post;
+  revalidatePath("/post/" + post.id);
 });

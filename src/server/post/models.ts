@@ -43,3 +43,8 @@ export const postGetByIdInputSchema = z.object({
 export const postGetRepliesByPostIdInputSchema = z.object({
   postId: z.string().uuid(),
 });
+
+export const createPostFormSchema = z.object({
+  content: z.string().min(1).max(280).emoji(),
+  replyToId: z.string().optional(),
+});

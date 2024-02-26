@@ -5,7 +5,7 @@ import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
-import { BottomDrawer } from "./_components/drawer";
+import BottomDrawer from "./_components/drawer";
 import { Toaster } from "react-hot-toast";
 
 const inter = Inter({

@@ -16,7 +16,7 @@ import { ChevronUp } from "lucide-react";
 import { Login } from "./login";
 dayjs.extend(relativeTime);
 
-export async function BottomDrawer() {
+export default async function BottomDrawer() {
   return (
     <div className="fixed bottom-4 right-4">
       <Drawer>

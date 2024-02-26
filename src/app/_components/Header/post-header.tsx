@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { getRandomMessage, toastError, toastSuccess } from "@/lib/utils";
@@ -9,24 +8,19 @@ import { LoadingSpinner } from "../loading";
 import { useForm } from "react-hook-form";
 import { LinkedImage } from "../linked-image";
 import { createPost } from "@/server/post/actions";
-import { z } from "zod";
+import type { z } from "zod";
 import { useAction } from "next-safe-action/hooks";
-
-export const createPostFormSchema = z.object({
-  content: z.string().min(1).max(280).emoji(),
-  replyToId: z.string().optional(),
-});
+import type { createPostFormSchema } from "@/server/post/models";
 
 type createPostFormType = z.infer<typeof createPostFormSchema>;
 
-export function PostHeader(props: {
+export default function PostHeader(props: {
   imageUrl: string;
   username: string;
   placeholderMessage: string;
   replyToId?: string;
 }) {
   const { imageUrl, username, placeholderMessage, replyToId } = props;
-  const router = useRouter();
   const { register, handleSubmit, reset, formState } =
     useForm<createPostFormType>({ defaultValues: { replyToId } });
 
@@ -34,7 +28,6 @@ export function PostHeader(props: {
     onSuccess: () => {
       toastSuccess(getRandomMessage(celebratoryChirps));
       reset();
-      router.refresh();
     },
     onError: (error) => {
       if (error.validationErrors) {

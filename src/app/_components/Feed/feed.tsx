@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { FeedItem, type FeedItemProps } from "./feed-item";
+import FeedItem, { type FeedItemProps } from "./feed-item";
 import { LoadingBar } from "../loading";
 
 export async function Feed(props: { posts: FeedItemProps[] }) {

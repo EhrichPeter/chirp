@@ -6,6 +6,7 @@ import { db } from "@/server/db";
 import { action } from "../safe-action";
 import { likeToggleInputSchema } from "./models";
 import { auth } from "@clerk/nextjs";
+import { revalidatePath } from "next/cache";
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
@@ -51,6 +52,7 @@ export const toggleLike = action(likeToggleInputSchema, async (input) => {
         });
       }
     });
+    revalidatePath("/post/" + input.postId);
   } catch (error) {
     // Handle potential database errors more gracefully
     console.error("Error during like toggle:", error);
