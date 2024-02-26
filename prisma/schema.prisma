@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+
+    // Do not use foreign keys (PlanetScale does not support them)
+    relationMode = "prisma"
+}
+
+model Post {
+    id         String   @id @default(uuid())
+    content    String   @db.VarChar(255)
+    authorId   String
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    likeCount  Int      @default(0)
+    replyCount Int      @default(0)
+    replyToId  String?  @db.VarChar(36)
+    replies    Post[]   @relation("PostReplies")
+    replyTo    Post?    @relation("PostReplies", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    likes      Like[]   @relation("PostLikes")
+
+    @@index([authorId])
+    @@index([replyToId])
+}
+
+model Like {
+    id       String @id @default(uuid())
+    postId   String
+    authorId String
+    Post     Post   @relation("PostLikes", fields: [postId], references: [id])
+
+    @@index([postId])
+    @@index([authorId])
+}
