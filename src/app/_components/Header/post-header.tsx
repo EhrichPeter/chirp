@@ -36,8 +36,12 @@ export function PostHeader(props: {
       reset();
       router.refresh();
     },
-    onError: () => {
-      toastError(getRandomMessage(errorChirps));
+    onError: (error) => {
+      if (error.validationErrors) {
+        toastError(getRandomMessage(errorChirps));
+      } else {
+        toastError("Post failed! 😢");
+      }
     },
   });
 
