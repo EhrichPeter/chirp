@@ -1,9 +1,10 @@
+import { userSlug } from "@/lib/utils";
+import { auth } from "@clerk/nextjs";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { LinkedImage } from "../linked-image";
-import { userSlug } from "@/lib/utils";
-import { LikeButton } from "./like-button";
 import { CommentCounterLink } from "./comment-counter";
+import { LikeButton } from "./like-button";
 
 export type FeedItemProps = {
   post: {
@@ -19,12 +20,12 @@ export type FeedItemProps = {
       authorId: string;
     }[];
   };
-  author: { username: string | null; imageUrl: string };
+  author: { username: string | null; imageUrl: string, id: string };
 };
 
 export default async function FeedItem(props: FeedItemProps) {
   const { post, author } = props;
-
+  const { userId } = auth()
   if (!author.username) return null;
 
   return (
@@ -65,7 +66,7 @@ export default async function FeedItem(props: FeedItemProps) {
       </div>
       <div className="flex items-center gap-3 pl-2">
         <CommentCounterLink post={post} />
-        <LikeButton post={post} isLiked={post.likes.length > 0} />
+        <LikeButton post={post} isLiked={!!post.likes.find(like => like.authorId === userId)} />
       </div>
     </div>
   );

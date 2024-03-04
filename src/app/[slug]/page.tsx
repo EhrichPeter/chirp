@@ -1,13 +1,13 @@
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { displayName, userSlug } from "@/lib/utils";
-import { Suspense } from "react";
-import { LoadingBar } from "../_components/loading";
+import { getOneByUsername } from "@/server/profile/data";
+import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { Suspense } from "react";
 import { ProfileFeed } from "../_components/Profile/profile-feed";
 import { ProfileInsights } from "../_components/Profile/profile-insights";
-import { getOneByUsername } from "@/server/profile/data";
+import { LoadingBar } from "../_components/loading";
 
 export default async function Profile({
   params,
@@ -48,7 +48,6 @@ export default async function Profile({
         <div className="flex flex-col p-5">
           <h1 className="text-2xl font-bold ">{displayName(user)}</h1>
           <h2 className="text-gray-400">{userSlug(user.username!)}</h2>
-          <p className="pt-5">This is a test bio.</p>
         </div>
         <Suspense fallback={<LoadingBar />}>
           <ProfileFeed author={user} />

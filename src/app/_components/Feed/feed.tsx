@@ -1,8 +1,9 @@
+import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
-import FeedItem, { type FeedItemProps } from "./feed-item";
 import { LoadingBar } from "../loading";
+import FeedItem, { type FeedItemProps } from "./feed-item";
 
-export async function Feed(props: { posts: FeedItemProps[] }) {
+export function Feed(props: { posts: FeedItemProps[] }) {
   const { posts } = props;
   return (
     <Suspense fallback={<LoadingBar />}>
@@ -17,6 +18,10 @@ export async function Feed(props: { posts: FeedItemProps[] }) {
           );
         })}
       </div>
+      < Button variant={"outline"}>
+        Load more
+      </Button>
     </Suspense>
+
   );
 }
