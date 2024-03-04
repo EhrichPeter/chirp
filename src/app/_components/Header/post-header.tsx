@@ -1,16 +1,16 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { getRandomMessage, toastError, toastSuccess } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 import { celebratoryChirps, errorChirps } from "@/lib/data";
-import { LoadingSpinner } from "../loading";
-import { useForm } from "react-hook-form";
-import { LinkedImage } from "../linked-image";
+import { getRandomMessage, toastError, toastSuccess } from "@/lib/utils";
 import { createPost } from "@/server/post/actions";
-import type { z } from "zod";
-import { useAction } from "next-safe-action/hooks";
 import type { createPostFormSchema } from "@/server/post/models";
+import { useAction } from "next-safe-action/hooks";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
+import { LinkedImage } from "../linked-image";
+import { LoadingSpinner } from "../loading";
 
 type createPostFormType = z.infer<typeof createPostFormSchema>;
 
@@ -21,10 +21,10 @@ export default function PostHeader(props: {
   replyToId?: string;
 }) {
   const { imageUrl, username, placeholderMessage, replyToId } = props;
-  const { register, handleSubmit, reset, formState } =
+  const { register, handleSubmit, reset } =
     useForm<createPostFormType>({ defaultValues: { replyToId } });
 
-  const { execute } = useAction(createPost, {
+  const { execute, status } = useAction(createPost, {
     onSuccess: () => {
       toastSuccess(getRandomMessage(celebratoryChirps));
       reset();
@@ -51,12 +51,11 @@ export default function PostHeader(props: {
           {...register("content")}
           placeholder={placeholderMessage}
           className="w-full border-none bg-transparent focus:border-none focus:border-primary focus:outline-none"
-          disabled={formState.isSubmitting}
+          disabled={status === "executing"}
         />
-        {!formState.isSubmitting ? (
+        {!(status === "executing") ? (
           <Button
             type="submit"
-            disabled={formState.isSubmitting}
             variant="default"
             onKeyDown={(e) => {
               e.preventDefault();
@@ -65,7 +64,7 @@ export default function PostHeader(props: {
               }
             }}
           >
-            {formState.isSubmitting ? "⏳" : "📢"}
+            📢
           </Button>
         ) : (
           <LoadingSpinner size={35} />

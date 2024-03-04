@@ -1,31 +1,33 @@
-import { auth, clerkClient } from "@clerk/nextjs";
+"use server";
+
+import { clerkClient } from "@clerk/nextjs";
+import { Prisma } from "@prisma/client";
 import { db } from "../db";
 
-export const getManyByUserId = async (userId: string) => {
-  return await db.post.findMany({
-    where: { authorId: userId },
-    orderBy: { createdAt: "desc" },
-    include: {
-      likes: {
-        where: {
-          authorId: userId,
-        },
-      },
-    },
+export const getCommentCountByUserId = async (userId: string) => {
+  return getCountByCondition({
+    authorId: userId,
+    replyToId: { not: null },
   });
 };
 
-export const getOneById = async (postId: string) => {
-  const { userId } = auth();
+export const getCommentCountByPostId = async (postId: string) => {
+  return getCountByCondition({ id: postId, replyToId: { not: null } });
+};
 
+export const getPostCountByUserId = async (userId: string) => {
+  return getCountByCondition({ authorId: userId, replyToId: null });
+};
+
+export const getManyByUserId = async (userId: string) => {
+  return await getMany({ where: { authorId: userId } });
+};
+
+export const getOneById = async (postId: string) => {
   const post = await db.post.findUnique({
     where: { id: postId },
     include: {
-      likes: {
-        where: {
-          authorId: userId ?? undefined,
-        },
-      },
+      likes: true,
     },
   });
 
@@ -45,70 +47,34 @@ export const getOneById = async (postId: string) => {
 };
 
 export const getManyRepliesByPostId = async (postId: string) => {
-  const { userId } = auth();
-
-  try {
-    const replies = await db.post.findMany({
-      where: { replyToId: postId },
-      orderBy: { createdAt: "desc" },
-      include: {
-        likes: {
-          where: {
-            authorId: userId ?? undefined,
-          },
-        },
-      },
-    });
-
-    const userIds = replies.map((reply) => reply.authorId);
-    const users = await clerkClient.users.getUserList({ userId: userIds });
-
-    const repliesWithUsers = replies.map((reply) => {
-      const author = users.find((user) => user.id === reply.authorId);
-      if (!author) {
-        throw new Error("Author not found for reply.");
-      }
-
-      return {
-        post: reply,
-        author,
-      };
-    });
-
-    return repliesWithUsers;
-  } catch (error) {
-    console.error("Error in getManyRepliesByPostId:", error);
-    throw new Error("Failed to retrieve replies.");
-  }
+  return await getMany({ where: { replyToId: postId } });
 };
 
 export const getManyPosts = async () => {
-  const { userId } = auth();
+  return await getMany({ where: { replyToId: null } });
+};
 
+const getMany = async (inputParams: {
+  take?: number;
+  where: Prisma.PostWhereInput;
+}) => {
   try {
     const posts = await db.post.findMany({
       orderBy: { createdAt: "desc" },
-      take: 100,
-      where: { replyToId: null },
+      take: inputParams.take ?? 10,
+      where: inputParams.where,
       include: {
-        likes: {
-          where: {
-            authorId: userId ?? undefined,
-          },
-        },
+        likes: true,
       },
     });
 
     const userIds = posts.map((post) => post.authorId);
-    const users = await clerkClient.users.getUserList({
-      userId: userIds,
-      limit: 100,
-    });
+    const users = await clerkClient.users.getUserList({ userId: userIds });
 
-    return posts.map((post) => {
+    const postsWithUsers = posts.map((post) => {
       const author = users.find((user) => user.id === post.authorId);
       if (!author) {
-        throw new Error("Author not found for post.");
+        throw new Error("Author not found for reply.");
       }
 
       return {
@@ -116,8 +82,16 @@ export const getManyPosts = async () => {
         author,
       };
     });
+
+    return postsWithUsers;
   } catch (error) {
     console.error("Error in getManyPosts:", error);
     throw new Error("Failed to retrieve posts.");
   }
+};
+
+export const getCountByCondition = async (condition: Prisma.PostWhereInput) => {
+  return db.post.count({
+    where: condition,
+  });
 };
